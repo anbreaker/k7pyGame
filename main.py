@@ -24,7 +24,7 @@ class Bomb:
         self.num_frames = len(self.frames)
 
         self.current_time = 0
-        self.animation_time = FPS//60
+        self.animation_time = FPS * 4 # Lo que tarda un segundo lo multiplico para tarde 4
 
     def update(self, dt):
         self.current_time += dt
