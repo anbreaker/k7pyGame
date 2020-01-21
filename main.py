@@ -70,7 +70,6 @@ class Game:
 
             # pintar robot y bombas en pantalla
             self.screen.fill(self.background_color)
-            
 
             self.all_group.update(dt)
             self.all_group.draw(self.screen)
