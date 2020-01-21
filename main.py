@@ -7,12 +7,22 @@ init()
 FPS = 60
 
 
-class Bomb:
+class Bomb(sprite.Sprite):
     pictures = ['bomb_01.png', 'bomb_02.png', 'bomb_03.png', 'bomb_04.png']
+    w = 44
+    h = 42
 
     def __init__(self, x=0, y=0):
+        # self.w = 44
+        # self.h = 42
         self.x = x
         self.y = y
+        
+        #Instancio el consturctor de la clase que Heredo
+        sprite.Sprite.__init__(self)
+        
+        #pygame.Rect
+        self.rect = Rect(self.x, self.y, self.w, self.h)
 
         self.frames = []
         for pict in self.pictures:
@@ -24,7 +34,7 @@ class Bomb:
         self.num_frames = len(self.frames)
 
         self.current_time = 0
-        self.animation_time = FPS * 4 # Lo que tarda un segundo lo multiplico para tarde 4
+        self.animation_time = FPS * 4  # Lo que tarda un segundo lo multiplico para tarde 4
 
     def update(self, dt):
         self.current_time += dt
@@ -35,23 +45,30 @@ class Bomb:
                 self.frame_act = 0
             # self.frame_act = (self.frame_act + 1) % self.num_frames
 
-    @property
-    def position(self):
-        return self.x, self.y
 
     @property
     def image(self):
         return self.frames[self.frame_act]
 
 
-class Robot:
-    speed = 5
+class Robot(sprite.Sprite):
+    speed = 3
     pictures = ['robot_r01.png', 'robot_r02.png',
                 'robot_r03.png', 'robot_r04.png']
+    w = 64
+    h = 68
 
     def __init__(self, x=0, y=0):
+        # self.w = 64
+        # self.h = 68
         self.x = x
         self.y = y
+        
+        #Instancio el consturctor de la clase que Heredo
+        sprite.Sprite.__init__(self)
+        
+        #pygame.Rect
+        self.rect = Rect(self.x, self.y, self.w, self.h)
 
         self.frames = []
         for pict in self.pictures:
@@ -73,24 +90,21 @@ class Robot:
         if self.y > 0:
             self.y -= self.speed
         '''
-        self.y = max(0, self.y - self.speed)
+        self.rect.y = max(0, self.rect.y - self.speed)
         self.change_frame()
 
     def go_down(self):
-        self.y = min(600, self.y + self.speed)
+        self.rect.y = min(600, self.rect.y + self.speed)
         self.change_frame()
 
     def go_left(self):
-        self.x = max(0, self.x - self.speed)
+        self.rect.x = max(0, self.rect.x - self.speed)
         self.change_frame()
 
     def go_right(self):
-        self.x = min(800, self.x + self.speed)
+        self.rect.x = min(800, self.rect.x + self.speed)
         self.change_frame()
 
-    @property
-    def position(self):
-        return self.x, self.y
 
     @property
     def image(self):
@@ -105,13 +119,19 @@ class Game:
         display.set_caption('Hola mundo!')
 
         self.background_color = (150, 150, 222)
+        
+        self.player_goup = sprite.Group()
+        self.bombs_group = sprite.Group()
+        self.all_group = sprite.Group()
 
         self.robot = Robot(400, 300)
+        self.player_goup.add(self.robot)
 
-        self.bombas = []
         for i in range(5):
-            self.bomb = Bomb(randint(0, 750), randint(0, 550))
-            self.bombas.append(self.bomb)
+            bomb = Bomb(randint(0, 750), randint(0, 550))
+            self.bombs_group.add(bomb)
+        
+        self.all_group.add(self.robot, self.bombs_group)
 
     def gameOver(self):
         quit()
@@ -144,16 +164,27 @@ class Game:
 
     def mainloop(self):
         while True:
+            # Control de Eventos
             dt = self.clock.tick(FPS)
-
             self.handleEvents()
 
+            # Control de colisiones:
+            # for b in self.bombas:
+                #Comprobar si b esta tocando a self.player
+                    # b.explotar()
+                    # player.morir()
+
+            #pintar robot y bombas en pantalla
             self.screen.fill(self.background_color)
+            '''
             self.screen.blit(self.robot.image, self.robot.position)
             for b in self.bombas:
                 b.update(dt)
                 self.screen.blit(b.image, b.position)
-
+            '''
+            
+            self.all_group.update(dt)
+            self.all_group.draw(self.screen)
             display.flip()
 
 
